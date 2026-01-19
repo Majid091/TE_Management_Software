@@ -5,44 +5,67 @@ const express = require('express');
 
 const server = express();
 let app;
+let bootstrapError = null;
 
 async function bootstrap() {
+  if (bootstrapError) {
+    throw bootstrapError;
+  }
+
   if (!app) {
-    // Import the compiled AppModule from dist
-    const { AppModule } = require('../dist/app.module');
-    const { ConfigService } = require('@nestjs/config');
+    try {
+      // Import the compiled AppModule (non-webpack build)
+      const { AppModule } = require('../dist/src/app.module');
+      const { ConfigService } = require('@nestjs/config');
 
-    app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+      app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
+        logger: ['error', 'warn', 'log'],
+      });
 
-    const configService = app.get(ConfigService);
+      const configService = app.get(ConfigService);
 
-    const apiPrefix = configService.get('app.apiPrefix') || 'api';
-    app.setGlobalPrefix(apiPrefix);
+      const apiPrefix = configService.get('app.apiPrefix') || 'api';
+      app.setGlobalPrefix(apiPrefix);
 
-    app.enableCors({
-      origin: configService.get('cors.origin') || '*',
-      credentials: configService.get('cors.credentials') !== false,
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-    });
+      app.enableCors({
+        origin: configService.get('cors.origin') || '*',
+        credentials: configService.get('cors.credentials') !== false,
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+      });
 
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        transform: true,
-        forbidNonWhitelisted: true,
-        transformOptions: {
-          enableImplicitConversion: true,
-        },
-      }),
-    );
+      app.useGlobalPipes(
+        new ValidationPipe({
+          whitelist: true,
+          transform: true,
+          forbidNonWhitelisted: true,
+          transformOptions: {
+            enableImplicitConversion: true,
+          },
+        }),
+      );
 
-    await app.init();
+      await app.init();
+      console.log('NestJS app initialized successfully');
+    } catch (error) {
+      console.error('Bootstrap error:', error);
+      bootstrapError = error;
+      throw error;
+    }
   }
   return app;
 }
 
 module.exports = async (req, res) => {
-  await bootstrap();
-  server(req, res);
+  try {
+    await bootstrap();
+    server(req, res);
+  } catch (error) {
+    console.error('Request handler error:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+    });
+  }
 };
