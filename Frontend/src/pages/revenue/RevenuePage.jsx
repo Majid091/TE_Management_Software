@@ -28,7 +28,7 @@ const RevenuePage = () => {
           revenueService.getSummary(),
           revenueService.getMonthly(),
           revenueService.getByDepartment(),
-          revenueService.getByProject(),
+          revenueService.getProjectsRevenue(),
         ]);
         setRevenueData({
           summary,

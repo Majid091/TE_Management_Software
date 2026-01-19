@@ -91,33 +91,33 @@ const DashboardPage = () => {
       >
         <StatCard
           title="Total Employees"
-          value={formatNumber(overview.totalEmployees)}
+          value={formatNumber(overview.totalEmployees ?? 0)}
           icon={Users}
           trend="up"
-          trendValue={`${overview.employeeGrowth}%`}
+          trendValue={`${overview.employeeGrowth ?? 0}%`}
           color="primary"
         />
         <StatCard
           title="Active Projects"
-          value={formatNumber(overview.totalProjects)}
+          value={formatNumber(overview.totalProjects ?? 0)}
           icon={FolderKanban}
           trend="up"
-          trendValue={`${overview.projectGrowth}%`}
+          trendValue={`${overview.projectGrowth ?? 0}%`}
           color="success"
         />
         <StatCard
           title="Departments"
-          value={formatNumber(overview.totalDepartments)}
+          value={formatNumber(overview.totalDepartments ?? 0)}
           icon={Building2}
           color="info"
         />
         {canViewRevenue(user) && (
           <StatCard
             title="Total Revenue"
-            value={formatCurrency(overview.totalRevenue)}
+            value={formatCurrency(overview.totalRevenue ?? 0)}
             icon={DollarSign}
             trend="up"
-            trendValue={`${overview.revenueGrowth}%`}
+            trendValue={`${overview.revenueGrowth ?? 0}%`}
             color="warning"
           />
         )}

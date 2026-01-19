@@ -127,6 +127,7 @@ export class RevenueService {
       profitMargin: Number(profitMargin.toFixed(2)),
       revenueGrowth: 15.2,
       expenseGrowth: 8.5,
+      profitGrowth: 12.3,
       activeProjects,
       completedProjects,
     };
@@ -212,6 +213,39 @@ export class RevenueService {
       expenses,
       profit,
     };
+  }
+
+  async getAllProjectsRevenue() {
+    const projects = await this.prisma.project.findMany({
+      where: { deletedAt: null },
+      include: {
+        department: true,
+        revenueRecords: {
+          where: { deletedAt: null },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return projects.map((project) => {
+      const totalRevenue = project.revenueRecords.reduce(
+        (sum, rev) => sum + Number(rev.amount),
+        0,
+      );
+      const totalExpenses = project.revenueRecords.reduce(
+        (sum, rev) => sum + Number(rev.expense),
+        0,
+      );
+
+      return {
+        id: project.id.toString(),
+        name: project.name,
+        department: project.department?.name || 'Unknown',
+        revenue: totalRevenue,
+        profit: totalRevenue - totalExpenses,
+        status: project.status,
+      };
+    }).sort((a, b) => b.revenue - a.revenue);
   }
 
   async getByProject(projectId: number) {

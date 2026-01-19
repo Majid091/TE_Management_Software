@@ -40,8 +40,9 @@ export class RevenueController {
   }
 
   @Get('monthly')
-  getMonthly(@Query('year', ParseIntPipe) year?: number) {
-    return this.revenueService.getMonthly(year);
+  getMonthly(@Query('year') year?: string) {
+    const yearNum = year ? parseInt(year, 10) : undefined;
+    return this.revenueService.getMonthly(yearNum);
   }
 
   @Get('yearly')
@@ -54,13 +55,23 @@ export class RevenueController {
     return this.revenueService.getByDateRange(dateRangeDto);
   }
 
+  @Get('by-project')
+  getAllProjectsRevenue() {
+    return this.revenueService.getAllProjectsRevenue();
+  }
+
   @Get('project/:id')
   getByProject(@Param('id', ParseIntPipe) id: number) {
     return this.revenueService.getByProject(id);
   }
 
-  @Get('department/:id?')
-  getByDepartment(@Param('id', ParseIntPipe) id?: number) {
+  @Get('by-department')
+  getAllDepartmentsRevenue() {
+    return this.revenueService.getByDepartment();
+  }
+
+  @Get('department/:id')
+  getByDepartment(@Param('id', ParseIntPipe) id: number) {
     return this.revenueService.getByDepartment(id);
   }
 
