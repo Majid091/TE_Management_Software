@@ -8,7 +8,9 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
-  app.setGlobalPrefix(configService.get('app.apiPrefix'));
+  app.setGlobalPrefix(configService.get('app.apiPrefix'), {
+    exclude: ['/', 'health'],
+  });
 
   app.enableCors({
     origin: configService.get('cors.origin'),
