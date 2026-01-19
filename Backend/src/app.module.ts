@@ -15,6 +15,7 @@ import { DepartmentsModule } from './modules/departments/departments.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { RevenueModule } from './modules/revenue/revenue.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
     RevenueModule,
     AnalyticsModule,
   ],
+  controllers: [HealthController],
   providers: [
     {
       provide: APP_GUARD,
